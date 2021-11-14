@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from datetime import datetime
+from datetime import date, datetime
 from time import localtime, sleep, time
 import pyautogui
 import pyperclip
@@ -28,8 +28,9 @@ cfg = ConfigParser()
 cfg.read("./test.cfg", encoding="utf-8")
 
 
-def isWed() -> bool:
-    return datetime.now().strftime("%A") == "Wednesday"
+def log(msg: str) -> None:
+    with open("./log.txt", encoding="utf8", mode="a") as log:
+        log.write(msg)
 
 
 def getWeek() -> str:
@@ -39,16 +40,10 @@ def getWeek() -> str:
 def getTodayMsg() -> tuple:
     today = 0
     msg = ""
-    if isWed():
-        last_3 = int(cfg.get("test", "last_3"))
-        today = last_3 % 5 + 1
-        msg = f"今天是星期三，上个星期是{last_3}号床，所以这个星期轮到：{today}号床"
-        cfg.set("test", "last_3", str(today))
-    else:
-        last_seq = int(cfg.get("test", "last_seq"))
-        today = last_seq % 5 + 1
-        msg = f"今天是{getWeek()}，昨天是{last_seq}号床，所以今天轮到{today}号床"
-        cfg.set("test", "last_seq", str(today))
+    last_seq = int(cfg.get("test", "last_seq"))
+    today = last_seq % 5 + 1
+    msg = f"今天是{getWeek()}，上一次是{last_seq}号床，所以这次轮到{today}号床"
+    cfg.set("test", "last_seq", str(today))
 
     return (today, msg)
 
@@ -74,7 +69,7 @@ def 吴学钊不在的世界():
 
     # 粘贴消息
     pyperclip.copy(
-        todayMsg[1] + "\n【该消息由脚本自动生成，具体代码在https://www.github.com/esgloamp/TheWorldWithoutWXZ】")
+        todayMsg[1] + "\n【来自107宿舍倒垃圾提醒小助手，该消息由脚本自动生成，具体代码在https://www.github.com/esgloamp/TheWorldWithoutWXZ】")
     pyautogui.hotkey('ctrl', 'v')
 
     # 发送消息
@@ -82,6 +77,9 @@ def 吴学钊不在的世界():
 
     with open("./test.cfg", "w", encoding="utf-8") as file:
         cfg.write(file)
+
+    log(
+        f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S %a')} -> {todayMsg[1]}\n")
 
 
 schedule.every().day.at("21:30").do(吴学钊不在的世界)
