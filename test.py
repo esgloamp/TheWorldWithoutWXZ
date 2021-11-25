@@ -15,14 +15,18 @@ week = {
     "Sunday": "星期天",
 }
 
-beds = {
-    1: "李宇航",
-    2: "吴志锋",
-    3: "文件传输助手",
-    4: "张建宇",
-    5: "杨金辉",
-}
+# beds = {
+#     1: "李宇航",
+#     2: "吴志锋",
+#     3: "文件传输助手",
+#     # 4: "张建宇",
+#     5: "杨金辉",
+# }
 
+beds = ("李宇航",
+        "吴志锋",
+        "文件传输助手",
+        "杨金辉")
 
 cfg = ConfigParser()
 cfg.read("./test.cfg", encoding="utf-8")
@@ -38,12 +42,12 @@ def getWeek() -> str:
 
 
 def getTodayMsg() -> tuple:
-    today = 0
-    msg = ""
     last_seq = int(cfg.get("test", "last_seq"))
-    today = last_seq % 5 + 1
-    msg = f"今天是{getWeek()}，上一次是{last_seq}号床，所以这次轮到{today}号床"
-    cfg.set("test", "last_seq", str(today))
+    last = beds[last_seq]
+    today_seq = (last_seq+1) % len(beds)
+    today = beds[today_seq]
+    msg = f"今天是{getWeek()}，上一次是{last}，所以这次轮到{today}"
+    cfg.set("test", "last_seq", str(today_seq))
 
     return (today, msg)
 
@@ -51,21 +55,21 @@ def getTodayMsg() -> tuple:
 def 吴学钊不在的世界():
     # 打开微信
     pyautogui.hotkey('ctrl', 'alt', 'w')
-    sleep(3)
+    sleep(2)
 
     # 打开搜索栏
     pyautogui.hotkey('ctrl', 'f')
-    sleep(3)
+    sleep(2)
 
     # 搜索名字
     todayMsg = getTodayMsg()
     pyperclip.copy(beds[todayMsg[0]])
     pyautogui.hotkey('ctrl', 'v')
-    sleep(3)
+    sleep(2)
 
     # 选择用户
     pyautogui.hotkey('Enter')
-    sleep(5)
+    sleep(2)
 
     # 粘贴消息
     pyperclip.copy(
